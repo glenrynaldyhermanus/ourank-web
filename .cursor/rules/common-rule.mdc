@@ -1,0 +1,15 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+-. Jangan ubah yang saya tidak minta ubah dan tidak ada improvisasi jika saya tidak minta.
+-. Jika ada rekomendasi atau perubahan di luar itu, tanyakan ke saya dulu.
+-. Untuk setiap pembuatan element cek di src/components apakah ada yang bisa di pakai, jangan buat sendiri.
+-. Untuk yang berhubungan dengan database. Check skema di database/schema.sql. Dan apabila skema tidak mendukung, silahkan suggest perubahan atau penambahan.
+-. Pastikan style dan theme halaman konsisten. Tidak mengubah style kecuali saya minta.
+-. Jangan push ke git atau deploy jika saya tidak minta, karena harus saya test.
+-. Kalau saya bilang deploy, artinya npm deploy.
+-. Jika ingin styling warna, pastikan support dark theme.
+-. Setiap ada perubahan yang signifikan, simpan di folder /logs/{tanggal_chat}.md
