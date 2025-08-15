@@ -1,5 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/sign-in/page": "app/sign-in/page.js"
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/admin/companies/page": "app/admin/companies/page.js",
+  "/admin/assessments/page": "app/admin/assessments/page.js",
+  "/admin/interviews/page": "app/admin/interviews/page.js",
+  "/admin/talent-pool/page": "app/admin/talent-pool/page.js"
 }
