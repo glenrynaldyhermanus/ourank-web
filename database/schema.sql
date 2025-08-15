@@ -1485,3 +1485,998 @@ CREATE POLICY IF NOT EXISTS "Enable read access for all users" ON public.users
     WITH CHECK (true);
 
 
+-- ========================================
+-- OURANK: INDEXES
+-- ========================================
+
+-- Core Talent
+CREATE INDEX IF NOT EXISTS idx_talent_profiles_open_to_work ON public.talent_profiles(open_to_work);
+CREATE INDEX IF NOT EXISTS idx_talent_profiles_rating ON public.talent_profiles(rating_avg);
+CREATE INDEX IF NOT EXISTS idx_talent_skills_user ON public.talent_skills(user_id);
+CREATE INDEX IF NOT EXISTS idx_talent_skills_skill ON public.talent_skills(skill_tag_id);
+CREATE INDEX IF NOT EXISTS idx_talent_experiences_user ON public.talent_experiences(user_id);
+CREATE INDEX IF NOT EXISTS idx_talent_educations_user ON public.talent_educations(user_id);
+CREATE INDEX IF NOT EXISTS idx_talent_reviews_talent ON public.talent_reviews(talent_user_id);
+CREATE INDEX IF NOT EXISTS idx_talent_reviews_business ON public.talent_reviews(business_id);
+
+-- Hiring / ATS
+CREATE INDEX IF NOT EXISTS idx_jobs_business_status ON public.jobs(business_id, status);
+CREATE INDEX IF NOT EXISTS idx_jobs_store ON public.jobs(store_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_city ON public.jobs(city_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_published_at ON public.jobs(published_at);
+CREATE INDEX IF NOT EXISTS idx_job_stages_job_sort ON public.job_stages(job_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_job_applications_job ON public.job_applications(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_applications_candidate ON public.job_applications(candidate_user_id);
+CREATE INDEX IF NOT EXISTS idx_job_applications_status ON public.job_applications(status);
+CREATE INDEX IF NOT EXISTS idx_application_stage_histories_application ON public.application_stage_histories(application_id);
+CREATE INDEX IF NOT EXISTS idx_application_assessments_application ON public.application_assessments(application_id);
+CREATE INDEX IF NOT EXISTS idx_application_assessments_status ON public.application_assessments(status);
+CREATE INDEX IF NOT EXISTS idx_assessment_results_assessment ON public.assessment_results(application_assessment_id);
+CREATE INDEX IF NOT EXISTS idx_interviews_application ON public.interviews(application_id);
+CREATE INDEX IF NOT EXISTS idx_interviews_scheduled_start ON public.interviews(scheduled_start);
+CREATE INDEX IF NOT EXISTS idx_interview_participants_interview ON public.interview_participants(interview_id);
+CREATE INDEX IF NOT EXISTS idx_hr_freelancer_assignments_business ON public.hr_freelancer_assignments(business_id);
+CREATE INDEX IF NOT EXISTS idx_hr_freelancer_assignments_freelancer ON public.hr_freelancer_assignments(freelancer_id);
+
+-- HRIS
+CREATE INDEX IF NOT EXISTS idx_departments_business ON public.departments(business_id);
+CREATE INDEX IF NOT EXISTS idx_positions_business ON public.positions(business_id);
+CREATE INDEX IF NOT EXISTS idx_positions_department ON public.positions(department_id);
+CREATE INDEX IF NOT EXISTS idx_employees_business ON public.employees(business_id);
+CREATE INDEX IF NOT EXISTS idx_employees_store ON public.employees(store_id);
+CREATE INDEX IF NOT EXISTS idx_employees_position ON public.employees(position_id);
+CREATE INDEX IF NOT EXISTS idx_employees_status ON public.employees(status);
+CREATE INDEX IF NOT EXISTS idx_employees_hire_date ON public.employees(hire_date);
+CREATE INDEX IF NOT EXISTS idx_employee_transfers_employee ON public.employee_transfers(employee_id);
+CREATE INDEX IF NOT EXISTS idx_employee_transfers_effective_date ON public.employee_transfers(effective_date);
+CREATE INDEX IF NOT EXISTS idx_shift_templates_business ON public.shift_templates(business_id);
+CREATE INDEX IF NOT EXISTS idx_shift_schedules_employee_date ON public.shift_schedules(employee_id, work_date);
+CREATE INDEX IF NOT EXISTS idx_shift_schedules_status ON public.shift_schedules(status);
+CREATE INDEX IF NOT EXISTS idx_attendance_records_employee ON public.attendance_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_attendance_records_schedule ON public.attendance_records(schedule_id);
+CREATE INDEX IF NOT EXISTS idx_attendance_records_check_in ON public.attendance_records(check_in_at);
+CREATE INDEX IF NOT EXISTS idx_leave_types_business ON public.leave_types(business_id);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_employee ON public.leave_requests(employee_id);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON public.leave_requests(status);
+CREATE INDEX IF NOT EXISTS idx_employee_compensations_employee ON public.employee_compensations(employee_id);
+CREATE INDEX IF NOT EXISTS idx_employee_compensations_active ON public.employee_compensations(is_active);
+CREATE INDEX IF NOT EXISTS idx_payroll_runs_business_period ON public.payroll_runs(business_id, period_start_date, period_end_date);
+CREATE INDEX IF NOT EXISTS idx_payroll_runs_status ON public.payroll_runs(status);
+CREATE INDEX IF NOT EXISTS idx_payslips_run_employee ON public.payslips(payroll_run_id, employee_id);
+CREATE INDEX IF NOT EXISTS idx_payslip_items_payslip ON public.payslip_items(payslip_id);
+
+-- LnD
+CREATE INDEX IF NOT EXISTS idx_courses_business ON public.courses(business_id);
+CREATE INDEX IF NOT EXISTS idx_courses_published ON public.courses(is_published);
+CREATE INDEX IF NOT EXISTS idx_course_enrollments_course ON public.course_enrollments(course_id);
+CREATE INDEX IF NOT EXISTS idx_course_enrollments_user ON public.course_enrollments(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_certifications_user ON public.user_certifications(user_id);
+
+-- Social
+CREATE INDEX IF NOT EXISTS idx_talent_posts_user_created ON public.talent_posts(user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_talent_posts_visibility ON public.talent_posts(visibility);
+CREATE INDEX IF NOT EXISTS idx_talent_post_comments_post ON public.talent_post_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_talent_post_likes_post ON public.talent_post_likes(post_id);
+CREATE INDEX IF NOT EXISTS idx_talent_follows_pair ON public.talent_follows(follower_user_id, following_user_id);
+
+-- Matching
+CREATE INDEX IF NOT EXISTS idx_job_candidate_matches_job ON public.job_candidate_matches(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_candidate_matches_candidate ON public.job_candidate_matches(candidate_user_id);
+CREATE INDEX IF NOT EXISTS idx_job_candidate_matches_score ON public.job_candidate_matches(score);
+
+
+-- ========================================
+-- OURANK: RLS ENABLE
+-- ========================================
+
+ALTER TABLE public.talent_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.skill_tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.talent_skills ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.talent_experiences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.talent_educations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.talent_reviews ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.hr_freelancers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.job_stages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.job_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.application_stage_histories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.assessment_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.application_assessments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.assessment_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.interviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.interview_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hr_freelancer_assignments ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.departments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.positions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.employees ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.employee_transfers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shift_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shift_schedules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.attendance_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.leave_types ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.leave_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.employee_compensations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payroll_runs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payslips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payslip_items ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_enrollments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_certifications ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.talent_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.talent_post_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.talent_post_likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.talent_follows ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.job_candidate_matches ENABLE ROW LEVEL SECURITY;
+
+
+-- ========================================
+-- OURANK: RLS POLICIES
+-- ========================================
+
+-- talent_profiles
+CREATE POLICY IF NOT EXISTS "talent_profiles_insert_own" ON public.talent_profiles
+    FOR INSERT
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_profiles_update_own" ON public.talent_profiles
+    FOR UPDATE
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_profiles_delete_own" ON public.talent_profiles
+    FOR DELETE
+    USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_profiles_select_visibility" ON public.talent_profiles
+    FOR SELECT
+    USING (
+        user_id = auth.uid()
+        OR visibility = 'public'
+        OR (
+            visibility = 'network'
+            AND EXISTS (
+                SELECT 1 FROM public.talent_follows tf
+                WHERE tf.follower_user_id = auth.uid()
+                  AND tf.following_user_id = public.talent_profiles.user_id
+            )
+        )
+    );
+
+-- skill_tags
+CREATE POLICY IF NOT EXISTS "skill_tags_read_all" ON public.skill_tags
+    FOR SELECT
+    USING (true);
+CREATE POLICY IF NOT EXISTS "skill_tags_write_auth" ON public.skill_tags
+    FOR ALL
+    USING (auth.uid() IS NOT NULL)
+    WITH CHECK (auth.uid() IS NOT NULL);
+
+-- talent_skills
+CREATE POLICY IF NOT EXISTS "talent_skills_crud_owner" ON public.talent_skills
+    FOR ALL
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_skills_select_public_profile" ON public.talent_skills
+    FOR SELECT
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.talent_profiles tp
+            WHERE tp.user_id = public.talent_skills.user_id
+              AND (
+                tp.visibility = 'public'
+                OR (
+                    tp.visibility = 'network' AND EXISTS (
+                        SELECT 1 FROM public.talent_follows tf
+                        WHERE tf.follower_user_id = auth.uid()
+                          AND tf.following_user_id = tp.user_id
+                    )
+                )
+              )
+        )
+    );
+
+-- talent_experiences
+CREATE POLICY IF NOT EXISTS "talent_experiences_crud_owner" ON public.talent_experiences
+    FOR ALL
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_experiences_select_public_profile" ON public.talent_experiences
+    FOR SELECT
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.talent_profiles tp
+            WHERE tp.user_id = public.talent_experiences.user_id
+              AND (
+                tp.visibility = 'public'
+                OR (
+                    tp.visibility = 'network' AND EXISTS (
+                        SELECT 1 FROM public.talent_follows tf
+                        WHERE tf.follower_user_id = auth.uid()
+                          AND tf.following_user_id = tp.user_id
+                    )
+                )
+              )
+        )
+    );
+
+-- talent_educations
+CREATE POLICY IF NOT EXISTS "talent_educations_crud_owner" ON public.talent_educations
+    FOR ALL
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_educations_select_public_profile" ON public.talent_educations
+    FOR SELECT
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.talent_profiles tp
+            WHERE tp.user_id = public.talent_educations.user_id
+              AND (
+                tp.visibility = 'public'
+                OR (
+                    tp.visibility = 'network' AND EXISTS (
+                        SELECT 1 FROM public.talent_follows tf
+                        WHERE tf.follower_user_id = auth.uid()
+                          AND tf.following_user_id = tp.user_id
+                    )
+                )
+              )
+        )
+    );
+
+-- talent_reviews
+CREATE POLICY IF NOT EXISTS "talent_reviews_read_public_or_owner" ON public.talent_reviews
+    FOR SELECT
+    USING (
+        talent_user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.talent_profiles tp
+            WHERE tp.user_id = public.talent_reviews.talent_user_id
+              AND (
+                tp.visibility = 'public'
+                OR (
+                    tp.visibility = 'network' AND EXISTS (
+                        SELECT 1 FROM public.talent_follows tf
+                        WHERE tf.follower_user_id = auth.uid()
+                          AND tf.following_user_id = tp.user_id
+                    )
+                )
+              )
+        )
+    );
+CREATE POLICY IF NOT EXISTS "talent_reviews_write_auth" ON public.talent_reviews
+    FOR INSERT
+    WITH CHECK (auth.uid() IS NOT NULL);
+
+-- hr_freelancers
+CREATE POLICY IF NOT EXISTS "hr_freelancers_read_all" ON public.hr_freelancers
+    FOR SELECT
+    USING (true);
+CREATE POLICY IF NOT EXISTS "hr_freelancers_crud_owner" ON public.hr_freelancers
+    FOR ALL
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+
+-- jobs
+CREATE POLICY IF NOT EXISTS "jobs_read_open" ON public.jobs
+    FOR SELECT
+    USING (status = 'open' OR EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.jobs.business_id
+    ));
+CREATE POLICY IF NOT EXISTS "jobs_manage_business_user" ON public.jobs
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.jobs.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.jobs.business_id
+    ));
+
+-- job_stages
+CREATE POLICY IF NOT EXISTS "job_stages_read_all" ON public.job_stages
+    FOR SELECT
+    USING (true);
+CREATE POLICY IF NOT EXISTS "job_stages_manage_business_user" ON public.job_stages
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.jobs j
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE j.id = public.job_stages.job_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.jobs j
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE j.id = public.job_stages.job_id AND ra.user_id = auth.uid()
+    ));
+
+-- job_applications
+CREATE POLICY IF NOT EXISTS "job_applications_select_candidate_or_business" ON public.job_applications
+    FOR SELECT
+    USING (
+        candidate_user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.jobs j
+            JOIN public.role_assignments ra ON ra.business_id = j.business_id
+            WHERE j.id = public.job_applications.job_id AND ra.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "job_applications_insert_candidate" ON public.job_applications
+    FOR INSERT
+    WITH CHECK (
+        candidate_user_id = auth.uid()
+        AND EXISTS (
+            SELECT 1 FROM public.jobs j WHERE j.id = job_id AND j.status = 'open'
+        )
+    );
+CREATE POLICY IF NOT EXISTS "job_applications_update_candidate_or_business" ON public.job_applications
+    FOR UPDATE
+    USING (
+        candidate_user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.jobs j
+            JOIN public.role_assignments ra ON ra.business_id = j.business_id
+            WHERE j.id = public.job_applications.job_id AND ra.user_id = auth.uid()
+        )
+    )
+    WITH CHECK (
+        candidate_user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.jobs j
+            JOIN public.role_assignments ra ON ra.business_id = j.business_id
+            WHERE j.id = public.job_applications.job_id AND ra.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "job_applications_delete_candidate_or_business" ON public.job_applications
+    FOR DELETE
+    USING (
+        candidate_user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.jobs j
+            JOIN public.role_assignments ra ON ra.business_id = j.business_id
+            WHERE j.id = public.job_applications.job_id AND ra.user_id = auth.uid()
+        )
+    );
+
+-- application_stage_histories
+CREATE POLICY IF NOT EXISTS "application_stage_histories_read_candidate_or_business" ON public.application_stage_histories
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.job_applications a
+            WHERE a.id = public.application_stage_histories.application_id
+              AND (a.candidate_user_id = auth.uid() OR EXISTS (
+                    SELECT 1 FROM public.jobs j
+                    JOIN public.role_assignments ra ON ra.business_id = j.business_id
+                    WHERE j.id = a.job_id AND ra.user_id = auth.uid()
+              ))
+        )
+    );
+CREATE POLICY IF NOT EXISTS "application_stage_histories_write_business" ON public.application_stage_histories
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.job_applications a
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE a.id = public.application_stage_histories.application_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.job_applications a
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE a.id = public.application_stage_histories.application_id AND ra.user_id = auth.uid()
+    ));
+
+-- assessment_templates
+CREATE POLICY IF NOT EXISTS "assessment_templates_read_all" ON public.assessment_templates
+    FOR SELECT
+    USING (true);
+CREATE POLICY IF NOT EXISTS "assessment_templates_write_auth" ON public.assessment_templates
+    FOR ALL
+    USING (auth.uid() IS NOT NULL)
+    WITH CHECK (auth.uid() IS NOT NULL);
+
+-- application_assessments
+CREATE POLICY IF NOT EXISTS "application_assessments_read_candidate_or_business" ON public.application_assessments
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.job_applications a
+            WHERE a.id = public.application_assessments.application_id
+              AND (a.candidate_user_id = auth.uid() OR EXISTS (
+                    SELECT 1 FROM public.jobs j
+                    JOIN public.role_assignments ra ON ra.business_id = j.business_id
+                    WHERE j.id = a.job_id AND ra.user_id = auth.uid()
+              ))
+        )
+    );
+CREATE POLICY IF NOT EXISTS "application_assessments_write_business" ON public.application_assessments
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.job_applications a
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE a.id = public.application_assessments.application_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.job_applications a
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE a.id = public.application_assessments.application_id AND ra.user_id = auth.uid()
+    ));
+
+-- assessment_results
+CREATE POLICY IF NOT EXISTS "assessment_results_read_candidate_or_business" ON public.assessment_results
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.application_assessments aa
+            JOIN public.job_applications a ON a.id = aa.application_id
+            WHERE aa.id = public.assessment_results.application_assessment_id
+              AND (a.candidate_user_id = auth.uid() OR EXISTS (
+                    SELECT 1 FROM public.jobs j
+                    JOIN public.role_assignments ra ON ra.business_id = j.business_id
+                    WHERE j.id = a.job_id AND ra.user_id = auth.uid()
+              ))
+        )
+    );
+CREATE POLICY IF NOT EXISTS "assessment_results_write_business" ON public.assessment_results
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.application_assessments aa
+        JOIN public.job_applications a ON a.id = aa.application_id
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE aa.id = public.assessment_results.application_assessment_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.application_assessments aa
+        JOIN public.job_applications a ON a.id = aa.application_id
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE aa.id = public.assessment_results.application_assessment_id AND ra.user_id = auth.uid()
+    ));
+
+-- interviews
+CREATE POLICY IF NOT EXISTS "interviews_read_candidate_participant_or_business" ON public.interviews
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.job_applications a
+            WHERE a.id = public.interviews.application_id
+              AND (a.candidate_user_id = auth.uid() OR EXISTS (
+                    SELECT 1 FROM public.interview_participants ip
+                    WHERE ip.interview_id = public.interviews.id AND ip.user_id = auth.uid()
+              ) OR EXISTS (
+                    SELECT 1 FROM public.jobs j
+                    JOIN public.role_assignments ra ON ra.business_id = j.business_id
+                    WHERE j.id = a.job_id AND ra.user_id = auth.uid()
+              ))
+        )
+    );
+CREATE POLICY IF NOT EXISTS "interviews_write_business" ON public.interviews
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.job_applications a
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE a.id = public.interviews.application_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.job_applications a
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE a.id = public.interviews.application_id AND ra.user_id = auth.uid()
+    ));
+
+-- interview_participants
+CREATE POLICY IF NOT EXISTS "interview_participants_read_related" ON public.interview_participants
+    FOR SELECT
+    USING (EXISTS (
+        SELECT 1 FROM public.interviews i
+        JOIN public.job_applications a ON a.id = i.application_id
+        WHERE i.id = public.interview_participants.interview_id
+          AND (EXISTS (
+                SELECT 1 FROM public.interview_participants ip
+                WHERE ip.interview_id = i.id AND ip.user_id = auth.uid()
+          ) OR a.candidate_user_id = auth.uid()
+            OR EXISTS (
+                SELECT 1 FROM public.jobs j
+                JOIN public.role_assignments ra ON ra.business_id = j.business_id
+                WHERE j.id = a.job_id AND ra.user_id = auth.uid()
+          ))
+    ));
+CREATE POLICY IF NOT EXISTS "interview_participants_write_business" ON public.interview_participants
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.interviews i
+        JOIN public.job_applications a ON a.id = i.application_id
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE i.id = public.interview_participants.interview_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.interviews i
+        JOIN public.job_applications a ON a.id = i.application_id
+        JOIN public.jobs j ON j.id = a.job_id
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE i.id = public.interview_participants.interview_id AND ra.user_id = auth.uid()
+    ));
+
+-- hr_freelancer_assignments
+CREATE POLICY IF NOT EXISTS "hr_freelancer_assignments_read_freelancer_or_business" ON public.hr_freelancer_assignments
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.hr_freelancers hf
+            WHERE hf.id = public.hr_freelancer_assignments.freelancer_id
+              AND hf.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.role_assignments ra
+            WHERE ra.user_id = auth.uid() AND ra.business_id = public.hr_freelancer_assignments.business_id
+        )
+    );
+CREATE POLICY IF NOT EXISTS "hr_freelancer_assignments_write_business" ON public.hr_freelancer_assignments
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.hr_freelancer_assignments.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.hr_freelancer_assignments.business_id
+    ));
+
+-- departments
+CREATE POLICY IF NOT EXISTS "departments_manage_business_user" ON public.departments
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.departments.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.departments.business_id
+    ));
+
+-- positions
+CREATE POLICY IF NOT EXISTS "positions_manage_business_user" ON public.positions
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.positions.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.positions.business_id
+    ));
+
+-- employees
+CREATE POLICY IF NOT EXISTS "employees_select_business_or_self" ON public.employees
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.role_assignments ra
+            WHERE ra.user_id = auth.uid() AND ra.business_id = public.employees.business_id
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.users u
+            WHERE u.id = auth.uid() AND u.id = public.employees.user_id
+        )
+    );
+CREATE POLICY IF NOT EXISTS "employees_manage_business_user" ON public.employees
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.employees.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.employees.business_id
+    ));
+
+-- employee_transfers
+CREATE POLICY IF NOT EXISTS "employee_transfers_manage_business_user" ON public.employee_transfers
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.employee_transfers.employee_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.employee_transfers.employee_id AND ra.user_id = auth.uid()
+    ));
+
+-- shift_templates
+CREATE POLICY IF NOT EXISTS "shift_templates_manage_business_user" ON public.shift_templates
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.shift_templates.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.shift_templates.business_id
+    ));
+
+-- shift_schedules
+CREATE POLICY IF NOT EXISTS "shift_schedules_select_business_or_employee" ON public.shift_schedules
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.employees e
+            JOIN public.role_assignments ra ON ra.business_id = e.business_id
+            WHERE e.id = public.shift_schedules.employee_id AND ra.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.employees e
+            WHERE e.id = public.shift_schedules.employee_id AND e.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "shift_schedules_manage_business_user" ON public.shift_schedules
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.shift_schedules.employee_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.shift_schedules.employee_id AND ra.user_id = auth.uid()
+    ));
+
+-- attendance_records
+CREATE POLICY IF NOT EXISTS "attendance_records_select_business_or_employee" ON public.attendance_records
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.employees e
+            JOIN public.role_assignments ra ON ra.business_id = e.business_id
+            WHERE e.id = public.attendance_records.employee_id AND ra.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.employees e
+            WHERE e.id = public.attendance_records.employee_id AND e.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "attendance_records_manage_business_user" ON public.attendance_records
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.attendance_records.employee_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.attendance_records.employee_id AND ra.user_id = auth.uid()
+    ));
+
+-- leave_types
+CREATE POLICY IF NOT EXISTS "leave_types_manage_business_user" ON public.leave_types
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.leave_types.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.leave_types.business_id
+    ));
+
+-- leave_requests
+CREATE POLICY IF NOT EXISTS "leave_requests_select_business_or_employee" ON public.leave_requests
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.employees e
+            JOIN public.role_assignments ra ON ra.business_id = e.business_id
+            WHERE e.id = public.leave_requests.employee_id AND ra.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.employees e
+            WHERE e.id = public.leave_requests.employee_id AND e.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "leave_requests_insert_employee" ON public.leave_requests
+    FOR INSERT
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.employees e
+        WHERE e.id = public.leave_requests.employee_id AND e.user_id = auth.uid()
+    ));
+CREATE POLICY IF NOT EXISTS "leave_requests_update_business_or_employee" ON public.leave_requests
+    FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.employees e
+            JOIN public.role_assignments ra ON ra.business_id = e.business_id
+            WHERE e.id = public.leave_requests.employee_id AND ra.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.employees e
+            WHERE e.id = public.leave_requests.employee_id AND e.user_id = auth.uid()
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.employees e
+            JOIN public.role_assignments ra ON ra.business_id = e.business_id
+            WHERE e.id = public.leave_requests.employee_id AND ra.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.employees e
+            WHERE e.id = public.leave_requests.employee_id AND e.user_id = auth.uid()
+        )
+    );
+
+-- employee_compensations
+CREATE POLICY IF NOT EXISTS "employee_compensations_manage_business_user" ON public.employee_compensations
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.employee_compensations.employee_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.employees e
+        JOIN public.role_assignments ra ON ra.business_id = e.business_id
+        WHERE e.id = public.employee_compensations.employee_id AND ra.user_id = auth.uid()
+    ));
+
+-- payroll_runs
+CREATE POLICY IF NOT EXISTS "payroll_runs_manage_business_user" ON public.payroll_runs
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.payroll_runs.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.payroll_runs.business_id
+    ));
+
+-- payslips
+CREATE POLICY IF NOT EXISTS "payslips_select_business_or_employee" ON public.payslips
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.payroll_runs pr
+            JOIN public.role_assignments ra ON ra.business_id = pr.business_id
+            WHERE pr.id = public.payslips.payroll_run_id AND ra.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.employees e
+            WHERE e.id = public.payslips.employee_id AND e.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "payslips_manage_business_user" ON public.payslips
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.payroll_runs pr
+        JOIN public.role_assignments ra ON ra.business_id = pr.business_id
+        WHERE pr.id = public.payslips.payroll_run_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.payroll_runs pr
+        JOIN public.role_assignments ra ON ra.business_id = pr.business_id
+        WHERE pr.id = public.payslips.payroll_run_id AND ra.user_id = auth.uid()
+    ));
+
+-- payslip_items
+CREATE POLICY IF NOT EXISTS "payslip_items_select_business_or_employee" ON public.payslip_items
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.payslips p
+            JOIN public.payroll_runs pr ON pr.id = p.payroll_run_id
+            JOIN public.role_assignments ra ON ra.business_id = pr.business_id
+            WHERE p.id = public.payslip_items.payslip_id AND ra.user_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.payslips p
+            JOIN public.employees e ON e.id = p.employee_id
+            WHERE p.id = public.payslip_items.payslip_id AND e.user_id = auth.uid()
+        )
+    );
+
+-- courses
+CREATE POLICY IF NOT EXISTS "courses_select_published_or_business" ON public.courses
+    FOR SELECT
+    USING (is_published = true OR EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.courses.business_id
+    ));
+CREATE POLICY IF NOT EXISTS "courses_manage_business_user" ON public.courses
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.courses.business_id
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.role_assignments ra
+        WHERE ra.user_id = auth.uid() AND ra.business_id = public.courses.business_id
+    ));
+
+-- course_enrollments
+CREATE POLICY IF NOT EXISTS "course_enrollments_select_owner_or_business" ON public.course_enrollments
+    FOR SELECT
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.courses c
+            JOIN public.role_assignments ra ON ra.business_id = c.business_id
+            WHERE c.id = public.course_enrollments.course_id AND ra.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "course_enrollments_insert_owner" ON public.course_enrollments
+    FOR INSERT
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "course_enrollments_update_owner_or_business" ON public.course_enrollments
+    FOR UPDATE
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.courses c
+            JOIN public.role_assignments ra ON ra.business_id = c.business_id
+            WHERE c.id = public.course_enrollments.course_id AND ra.user_id = auth.uid()
+        )
+    )
+    WITH CHECK (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.courses c
+            JOIN public.role_assignments ra ON ra.business_id = c.business_id
+            WHERE c.id = public.course_enrollments.course_id AND ra.user_id = auth.uid()
+        )
+    );
+
+-- user_certifications
+CREATE POLICY IF NOT EXISTS "user_certifications_crud_owner" ON public.user_certifications
+    FOR ALL
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "user_certifications_select_public_profile" ON public.user_certifications
+    FOR SELECT
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.talent_profiles tp
+            WHERE tp.user_id = public.user_certifications.user_id
+              AND (
+                tp.visibility = 'public'
+                OR (
+                    tp.visibility = 'network' AND EXISTS (
+                        SELECT 1 FROM public.talent_follows tf
+                        WHERE tf.follower_user_id = auth.uid()
+                          AND tf.following_user_id = tp.user_id
+                    )
+                )
+              )
+        )
+    );
+
+-- talent_posts
+CREATE POLICY IF NOT EXISTS "talent_posts_select_visibility" ON public.talent_posts
+    FOR SELECT
+    USING (
+        user_id = auth.uid()
+        OR visibility = 'public'
+        OR (
+            visibility = 'followers'
+            AND EXISTS (
+                SELECT 1 FROM public.talent_follows tf
+                WHERE tf.follower_user_id = auth.uid()
+                  AND tf.following_user_id = public.talent_posts.user_id
+            )
+        )
+        OR (
+            visibility = 'business'
+            AND EXISTS (
+                SELECT 1 FROM public.role_assignments ra
+                WHERE ra.user_id = auth.uid()
+            )
+        )
+    );
+CREATE POLICY IF NOT EXISTS "talent_posts_insert_owner" ON public.talent_posts
+    FOR INSERT
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_posts_update_delete_owner" ON public.talent_posts
+    FOR UPDATE
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS "talent_posts_delete_owner" ON public.talent_posts
+    FOR DELETE
+    USING (user_id = auth.uid());
+
+-- talent_post_comments
+CREATE POLICY IF NOT EXISTS "talent_post_comments_select_visibility" ON public.talent_post_comments
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.talent_posts p
+            WHERE p.id = public.talent_post_comments.post_id AND (
+                p.user_id = auth.uid()
+                OR p.visibility = 'public'
+                OR (p.visibility = 'followers' AND EXISTS (
+                    SELECT 1 FROM public.talent_follows tf
+                    WHERE tf.follower_user_id = auth.uid() AND tf.following_user_id = p.user_id
+                ))
+                OR (p.visibility = 'business' AND EXISTS (
+                    SELECT 1 FROM public.role_assignments ra WHERE ra.user_id = auth.uid()
+                ))
+            )
+        )
+    );
+CREATE POLICY IF NOT EXISTS "talent_post_comments_write_owner" ON public.talent_post_comments
+    FOR ALL
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+
+-- talent_post_likes
+CREATE POLICY IF NOT EXISTS "talent_post_likes_select_visibility" ON public.talent_post_likes
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.talent_posts p
+            WHERE p.id = public.talent_post_likes.post_id AND (
+                p.user_id = auth.uid()
+                OR p.visibility = 'public'
+                OR (p.visibility = 'followers' AND EXISTS (
+                    SELECT 1 FROM public.talent_follows tf
+                    WHERE tf.follower_user_id = auth.uid() AND tf.following_user_id = p.user_id
+                ))
+                OR (p.visibility = 'business' AND EXISTS (
+                    SELECT 1 FROM public.role_assignments ra WHERE ra.user_id = auth.uid()
+                ))
+            )
+        )
+    );
+CREATE POLICY IF NOT EXISTS "talent_post_likes_write_owner" ON public.talent_post_likes
+    FOR ALL
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+
+-- talent_follows
+CREATE POLICY IF NOT EXISTS "talent_follows_read_all" ON public.talent_follows
+    FOR SELECT
+    USING (true);
+CREATE POLICY IF NOT EXISTS "talent_follows_write_owner" ON public.talent_follows
+    FOR ALL
+    USING (follower_user_id = auth.uid())
+    WITH CHECK (follower_user_id = auth.uid());
+
+-- job_candidate_matches
+CREATE POLICY IF NOT EXISTS "job_candidate_matches_select_business_or_candidate" ON public.job_candidate_matches
+    FOR SELECT
+    USING (
+        candidate_user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.jobs j
+            JOIN public.role_assignments ra ON ra.business_id = j.business_id
+            WHERE j.id = public.job_candidate_matches.job_id AND ra.user_id = auth.uid()
+        )
+    );
+CREATE POLICY IF NOT EXISTS "job_candidate_matches_write_business" ON public.job_candidate_matches
+    FOR ALL
+    USING (EXISTS (
+        SELECT 1 FROM public.jobs j
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE j.id = public.job_candidate_matches.job_id AND ra.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.jobs j
+        JOIN public.role_assignments ra ON ra.business_id = j.business_id
+        WHERE j.id = public.job_candidate_matches.job_id AND ra.user_id = auth.uid()
+    ));
+
+
